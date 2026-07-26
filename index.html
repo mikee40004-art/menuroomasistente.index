@@ -17,8 +17,67 @@
         .btn-vip.btn-small { flex: 1.5; background: transparent; border: 1px solid rgba(255,255,255,0.3); padding: 12px 3px; font-size: 0.7rem; color: #f4f1ea; }
 
         .lang-switch { position: absolute; top: 27px; right: 15px; z-index: 1001; background: rgba(255,255,255,0.9); color: var(--oscuro); border: 1px solid var(--oro); padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
-        .exchange-banner { background: var(--oscuro); color: white; text-align: center; padding: 6px; font-size: 0.7rem; letter-spacing: 1px; border-bottom: 2px solid var(--oro); }
+        .exchange-banner { background: var(--oscuro); color: white; text-align: center; padding: 6px; font-size: 0.7rem; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         
+        /* BANNER WI-FI */
+        .wifi-banner {
+            background: #233140;
+            color: #f4f1ea;
+            text-align: center;
+            padding: 7px 15px;
+            font-size: 0.78rem;
+            border-bottom: 2px solid var(--oro);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .wifi-banner:hover { background: #1a2530; }
+        .wifi-btn-label {
+            background: var(--oro);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        /* MODAL WI-FI */
+        .wifi-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .wifi-modal-card {
+            background: white;
+            width: 88%;
+            max-width: 360px;
+            border-radius: 16px;
+            padding: 22px;
+            border: 2px solid var(--oro);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .wifi-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            line-height: 1;
+        }
+
         .hero { width: 100%; height: 200px; background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://i.postimg.cc/3wvwQcbD/SAVE-20260518-152440.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
         
         .nav-menu { display: flex; overflow-x: auto; gap: 10px; padding: 15px; position: sticky; top: 0; background: white; z-index: 1000; border-bottom: 1px solid #eee; -webkit-overflow-scrolling: touch; }
@@ -47,7 +106,7 @@
         
         textarea { width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 8px; font-size: 0.8rem; margin-bottom: 10px; box-sizing: border-box; font-family: inherit; background: #fcfcfc; resize: none; }
         textarea:disabled { background: #f5f5f5; color: #aaa; cursor: not-allowed; }
-        .btn-add { background: var(--oscuro); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-add { background: var(--oscuro); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: background 0.3s ease; }
 
         .canasta { background: #fdfcf9; border-top: 4px solid var(--oro); padding: 20px; margin-top: 20px; }
         .form-input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
@@ -114,8 +173,38 @@
 <!-- DIV DEL AVISO FLOTANTE ELEGANTE -->
 <div id="toast-notification" class="custom-toast">Ok</div>
 
+<!-- MODAL DE WI-FI -->
+<div id="wifi-modal" class="wifi-modal-overlay" onclick="cerrarWifiModal(event)">
+    <div class="wifi-modal-card">
+        <span class="wifi-modal-close" onclick="cerrarWifiModalDirecto()">&times;</span>
+        <h3 style="margin-top: 0; color: var(--oscuro); font-size: 1.2rem;">📶 Red Wi-Fi</h3>
+        <p style="font-size: 0.85rem; color: #555; margin-bottom: 15px;">Escanea el código QR o copia la contraseña para conectarte:</p>
+        
+        <div style="background: #f9f7f2; padding: 12px; border-radius: 10px; border: 1px solid var(--oro); text-align: left; margin-bottom: 15px; font-size: 0.9rem;">
+            <div style="margin-bottom: 6px;"><strong>Red:</strong> <span id="modal-wifi-ssid">Arcos_Micknet</span></div>
+            <div><strong>Contraseña:</strong> <span id="modal-wifi-pass" style="font-family: monospace; font-weight: bold; color: var(--oscuro);">Tulum2025</span></div>
+        </div>
+
+        <button onclick="copiarWifiPass()" style="background: var(--oscuro); color: white; border: 1px solid var(--oro); padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 15px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            📋 Copiar Contraseña
+        </button>
+
+        <div style="text-align: center;">
+            <img id="wifi-qr-img" src="" alt="Wi-Fi QR Code" style="border-radius: 10px; border: 1px solid #ddd; padding: 6px; background: white; width: 170px; height: 170px; display: block; margin: auto;">
+            <div style="font-size: 0.75rem; color: #888; margin-top: 8px;">Escanea con la cámara de tu celular</div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <div class="exchange-banner">Exchange Rate: 1 USD = 18.50 MXN</div>
+    
+    <!-- BANNER WI-FI INTERACTIVO -->
+    <div class="wifi-banner" onclick="abrirWifiModal()">
+        <span>📶 <strong>Wi-Fi:</strong> <span id="wifi-ssid-banner">Arcos_Micknet</span></span>
+        <span class="wifi-btn-label">Ver clave / QR 🔍</span>
+    </div>
+
     <div class="hero">
         <button class="lang-switch" onclick="toggleLang()" id="langBtn">🇺🇸 EN / 🇲🇽 ES</button>
     </div>
@@ -134,7 +223,6 @@
             <div><label id="lblHab" style="font-size: 0.75rem; font-weight:bold;">Habitación:</label><input type="text" id="room-num" class="form-input" placeholder="Ej. 110A"></div>
         </div>
         
-        <!-- SE AGREGÓ UN ID PARA PODER CONTROLAR SU VISIBILIDAD DINÁMICAMENTE -->
         <div style="margin-bottom: 20px;" id="payment-wrapper">
             <label id="lblPago" style="font-size: 0.75rem; font-weight:bold;">Forma de Pago:</label>
             <select id="payment-method" class="form-input">
@@ -190,6 +278,13 @@
 </div>
 
 <script>
+    // ==========================================
+    // CONFIGURACIÓN DE RED WI-FI 
+    // (Cambia estos dos valores al estar en el hotel)
+    // ==========================================
+    const WIFI_SSID = "Arcos_Micknet";
+    const WIFI_PASS = "Tulum2025";
+
     const TIPO_CAMBIO = 18.50;
     let currentLang = 'es';
     let carrito = [];
@@ -221,103 +316,374 @@
 
     const platillos = [
         { 
-            n_es: "Pizza Veggie", n_en: "Veggie Pizza", p: 255, c: "Desayuno", 
-            d_es: "Salsa de tomate artesanal, queso mozzarella, pimientos, cebolla y champiñones.",
-            d_en: "Artisanal tomato sauce, mozzarella cheese, bell peppers, onions, and mushrooms.",
-            tags: ["vegan"],
-            img: "https://i.postimg.cc/3wvwQcbD/SAVE-20260518-152440.jpg"
-        },
-        { 
-            n_es: "Bowl de Fruta Tropical", n_en: "Tropical Fruit Bowl", p: 160, c: "Desayuno", 
-            d_es: "Variedad de frutas de la región, menta fresca y coco rallado.",
-            d_en: "Assorted local fruits, fresh mint, and shredded coconut.",
+            n_es: "Fruta Tropical", n_en: "Tropical Fruit", p: 160, c: "Desayuno", 
+            d_es: "Piña, papaya, sandía y melón",
+            d_en: "Pineapple, papaya, watermelon and melon.",
             tags: ["vegan", "gf", "df"],
+            img: "https://i.postimg.cc/0ydn1Ygz/IMG-20260629-081837.jpg" 
+        },
+        { 
+            n_es: "Canasta de pan dulce", n_en: "Sweet bread basket", p: 90, c: "Desayuno", 
+            d_es: "Pan dulce, servido con mantequilla y mermelada casera del día.",
+            d_en: "Sweet bread served with butter and the homemade jam of the day.",
+            tags: [],
             img: "" 
         },
         { 
-            n_es: "Chilaquiles Tradicionales", n_en: "Traditional Chilaquiles", p: 240, c: "Desayuno", 
-            d_es: "Verdes o rojos, con crema, queso fresco y cebolla morada.",
-            d_en: "Green or red salsa, topped with sour cream, fresh cheese, and red onion.",
+            n_es: "Chilaquiles Tradicionales", n_en: "Chilaquiles", p: 235, c: "Desayuno", 
+            d_es: "Con salsa verde o roja, gratinados con queso gouda, crema, cebolla y cilantro. Con huevo o con pollo..",
+            d_en: "With red or green sauce with melted Gouda cheese, sour cream, onion and cilantro. Choose with eggs or chicken..",
+            tags: [],
+            img: "https://i.postimg.cc/wBhR2RDv/IMG-20260430-192623.jpg" 
+        },
+        { 
+            n_es: "Hot cakes", n_en: "Hot cakes", p: 215, c: "Desayuno", 
+            d_es: "Suaves y esponjosos, servidos con fruta de temporada y miel de abeja local.",
+            d_en: "Soft and fluffy pancakes served with seasonal fruit and local honey.",
+            tags: ["vegan"],
+            img: "https://i.postimg.cc/MG6D6nxj/IMG-20260618-082735.jpg" 
+        },
+        { 
+            n_es: "Huevos al gusto", n_en: "Eggs to taste", p: 280, c: "Desayuno", 
+            d_es: "Fritos, revueltos u omelette, servidos con frijoles refritos y papa rostizada.",
+            d_en: "Fried, scrambled, or omelet, served with refried beans and roasted potatoes..",
+            tags: [],
+            img: "https://i.postimg.cc/FzD046qx/IMG-20260724-084235.jpg" 
+        },
+        
+    
+        { 
+            n_es: "Guacamole", n_en: "Guacamole", p: 230, c: "Lunch", 
+            d_es: "Tradicional guacamole servido con totopos de maíz y queso fresco.",
+            d_en: "Traditional guacamole served with corn totopos and fresh cheese.",
+            tags: ["vegan"],
+            img: "https://i.postimg.cc/Prbxgb9J/Screenshot-2026-05-02-18-05-17-764-com-google-android-googlequicksearchbox-edit.jpg"
+        },
+        { 
+            n_es: "Bowl Mexicano", n_en: "Mexican Bowl", p: 230, c: "Lunch", 
+            d_es: "Arroz rojo a la mexicana, frijoles enteros y rebanadas de aguacate, servido con queso panela y jalapeño toreado.",
+            d_en: "Mexican style red rice, whole beans and avocado slices, served with panela cheese and charred jalapeño..",
+            tags: ["vegan", "gf", "df"],
+            img: "https://i.postimg.cc/FzD046qP/IMG-20260722-162534.jpg" 
+        },
+        { 
+            n_es: "Club Sandwich", n_en: "Club Sandwich", p: 295, c: "Lunch", 
+            d_es: "Pollo a la parrilla, tocino, jamón y queso, servido con papas a la francesa.",
+            d_en: "Grilled chicken, bacon, ham and cheese, served and french fries..",
             tags: ["gf"],
-            img: "" 
+            img: "https://i.postimg.cc/RFB3dhNM/IMG-20260716-145447.jpg" 
         },
     
         { 
-            n_es: "Pizza Veggie", n_en: "Veggie Pizza", p: 255, c: "Lunch", 
+            n_es: "Tacos al pastor", n_en: "Tacos al pastor", p: 255, c: "Lunch", 
             d_es: "Salsa de tomate artesanal, queso mozzarella, pimientos, cebolla y champiñones.",
-            d_en: "Artisanal tomato sauce, mozzarella cheese, bell peppers, onions, and mushrooms.",
+            d_en: "Pork marinated in chili and spice adobo, served with grilled pineapple, onion and cilantro.",
             tags: ["vegan"],
-            img: "https://i.postimg.cc/3wvwQcbD/SAVE-20260518-152440.jpg"
+            img: "https://i.postimg.cc/j2NBDqVZ/IMG-20260720-203905.jpg"
         },
         { 
-            n_es: "Bowl de Fruta Tropical", n_en: "Tropical Fruit Bowl", p: 160, c: "Lunch", 
-            d_es: "Variedad de frutas de la región, menta fresca y coco rallado.",
-            d_en: "Assorted local fruits, fresh mint, and shredded coconut.",
+            n_es: "Pasta cremosa", n_en: "Creamy pasta",
+            p: 260, d_es: "Espaguetti al gusto con chipotle, salsa de tomate o al burro, servido con queso parmesano y pan tostado.", 
+            d_en: "Spaguetti prepared with your choise of chipotle sauce, tomatoe sauce or butter sauce, served with parmesan cheese and toasted bread.",
             tags: ["vegan", "gf", "df"],
-            img: "" 
+            c: "Lunch", img: "" 
         },
         { 
-            n_es: "Chilaquiles Tradicionales", n_en: "Traditional Chilaquiles", p: 240, c: "Lunch", 
-            d_es: "Verdes o rojos, con crema, queso fresco y cebolla morada.",
-            d_en: "Green or red salsa, topped with sour cream, fresh cheese, and red onion.",
-            tags: ["gf"],
-            img: "" 
-        },
-    
-        { 
-            n_es: "Pizza Veggie", n_en: "Veggie Pizza", p: 255, c: "Cena", 
-            d_es: "Salsa de tomate artesanal, queso mozzarella, pimientos, cebolla y champiñones.",
-            d_en: "Artisanal tomato sauce, mozzarella cheese, bell peppers, onions, and mushrooms.",
-            tags: ["vegan"],
-            img: "https://i.postimg.cc/3wvwQcbD/SAVE-20260518-152440.jpg"
-        },
-        { 
-            n_es: "Bowl de Fruta Tropical", n_en: "Tropical Fruit Bowl", p: 160, c: "Cena", 
-            d_es: "Variedad de frutas de la región, menta fresca y coco rallado.",
-            d_en: "Assorted local fruits, fresh mint, and shredded coconut.",
+            n_es: "Tacos de pescado", n_en: "Fish tacos",
+            p: 270, d_es: "Rebosados en tempura de cerveza oscura y especias cajún, servidos con ensalada de col, mayonesa de chipotle y limón", 
+            d_en: "Dark beer and Cajun tempura battered fish, served with coleslaw, chipotle mayonnaise and lime",
             tags: ["vegan", "gf", "df"],
-            img: "" 
+            c: "Lunch", img: "https://i.postimg.cc/hGBLbpRS/IMG-20260213-WA0021.jpg" 
         },
         { 
-            n_es: "Chilaquiles Tradicionales", n_en: "Traditional Chilaquiles", p: 240, c: "Cena", 
-            d_es: "Verdes o rojos, con crema, queso fresco y cebolla morada.",
-            d_en: "Green or red salsa, topped with sour cream, fresh cheese, and red onion.",
-            tags: ["gf"],
-            img: "" 
+            n_es: "Hamburguesa de la casa", n_en: "House burguer",
+            p: 315, d_es: "Hecha con sirloin y arrachera, pan brioche y servida con papas a la francesa. Cuál es el término de su preferencia? Rojo, medio o bien cocido", 
+            d_en: "Made with sirloin and flank steak, served on a brioche bun with french fries. What is your preferred level of doneness? Rare, medium, or well-done",
+            tags: ["vegan", "gf", "df"],
+            c: "Lunch", img: "https://i.postimg.cc/vHs59RTT/SAVE-20260501-175829.jpg" 
         },
+        { 
+            n_es: "Pizza Margarita", n_en: "Margherita pizza",
+            p: 215, d_es: "Salsa pomodoro,mozzarella y albahaca fresca.", 
+            d_en: "Pomodoro sauce, mozzarella and fresh basil.",
+            tags: ["vegan", "gf", "df"],
+            c: "Lunch", img: "https://i.postimg.cc/FRbBhDc7/SAVE-20260604-183113.jpg" 
+        },
+        { 
+            n_es: "Pizza veggie", n_en: "Pizza veggie",
+            p: 255, d_es: "Champiñon, cebolla, espinaca y calabaza.", 
+            d_en: "Mushrooms, onion, spinach and zucchini.",
+            tags: ["vegan", "gf", "df"],
+            c: "Lunch", img: "https://i.postimg.cc/26dKC2vb/SAVE-20260501-175804.jpg" 
+        },
+        
+        { 
+            n_es: "Arroz con leche", n_en: "Rice pudding",
+            p: 80, d_es: "Postre: Cremoso, con notas de canela y vainilla, acompañado de pasitas.", 
+            d_en: "Dessert: Creamy rice pudding with notes of cinnamon and vanilla, acompanied by raisins.",
+            c: "Lunch", img: "" 
+        },
+        { 
+            n_es: "Flan de Vainilla", n_en: "Vanilla flan",
+            p: 70, d_es: "Postre: Cremoso, suave y dulce, que se deshace en cada bocado con el toque de caramelo dorado que recuerda a la cocina de la abuela.", 
+            d_en: "Dessert: Creamy, smooth, and sweet, melting in every bite with a touch of golden caramel reminiscent of grandma's kitchen .",
+            c: "Lunch", img: "" 
+        },
+        { 
+            n_es: "Carlota de limón", n_en: "Key lime Charlotte",
+            p: 95, d_es: "Postre: Delicioso postre fresco con sabor cítrico, elaborado en suaves capas de crema y galleta.", 
+            d_en: " Dessert: A refreshing citrus dessert made with delicate layers of cream and coockies.",
+            c: "Lunch", img: "" 
+        },
+        
 
         { 
-            n_es: "Margarita Artesanal de Mezcal", n_en: "Artisanal Mezcal Margarita", p: 220, c: "Bebidas", 
-            d_es: "Mezcal joven de la casa, jugo de limón fresco, controy y escarcha de sal de gusano.",
-            d_en: "House young mezcal, fresh lime juice, orange liqueur, and worm salt rim.",
-            tags: [], img: "" 
+            n_es: "Guacamole", n_en: "Guacamole", p: 230, c: "Cena", 
+            d_es: "Tradicional guacamole servido con totopos de maíz y queso fresco.",
+            d_en: "Traditional guacamole served with corn totopos and fresh cheese.",
+            tags: ["vegan"],
+            img: "https://i.postimg.cc/Prbxgb9J/Screenshot-2026-05-02-18-05-17-764-com-google-android-googlequicksearchbox-edit.jpg"
         },
         { 
-            n_es: "Agua Fresca del Día", n_en: "Fresh Water of the Day", p: 75, c: "Bebidas", 
-            d_es: "Frutas naturales de temporada preparadas al momento.",
-            d_en: "Freshly made seasonal fruit water.",
-            tags: ["vegan", "df"], img: "" 
+            n_es: "Bowl Mexicano", n_en: "Mexican Bowl", p: 230, c: "Cena", 
+            d_es: "Arroz rojo a la mexicana, frijoles enteros y rebanadas de aguacate, servido con queso panela y jalapeño toreado.",
+            d_en: "Mexican style red rice, whole beans and avocado slices, served with panela cheese and charred jalapeño..",
+            tags: ["vegan", "gf", "df"],
+            img: "https://i.postimg.cc/FzD046qP/IMG-20260722-162534.jpg" 
+        },
+        { 
+            n_es: "Club Sandwich", n_en: "Club Sandwich", p: 295, c: "Cena", 
+            d_es: "Pollo a la parrilla, tocino, jamón y queso, servido con papas a la francesa.",
+            d_en: "Grilled chicken, bacon, ham and cheese, served and french fries..",
+            tags: ["gf"],
+            img: "https://i.postimg.cc/RFB3dhNM/IMG-20260716-145447.jpg" 
         },
     
-        { n_es: "Cena Romántica en la Playa", n_en: "Romantic Beach Dinner", p: 3500, d_es: "Una velada inolvidable frente al mar con menú exclusivo.", d_en: "An unforgettable evening by the sea with an exclusive menu.", c: "Experiencias", tags: [], img: "" },
-        { n_es: "Tasting de Tequila Premium", n_en: "Premium Tequila Tasting", p: 1200, d_es: "Descubra las notas y herencia de nuestros tequilas.", d_en: "Discover the notes and heritage of our premium tequilas.", c: "Experiencias", tags: [], img: "" },
-        { n_es: "Cena Romántica en la Playa", n_en: "Romantic Beach Dinner", p: 3500, d_es: "Una velada inolvidable frente al mar con menú exclusivo.", d_en: "An unforgettable evening by the sea with an exclusive menu.", c: "Experiencias", tags: [], img: "" },
-        { n_es: "Tasting de Tequila Premium", n_en: "Premium Tequila Tasting", p: 1200, d_es: "Descubra las notas y herencia de nuestros tequilas.", d_en: "Discover the notes and heritage of our premium tequilas.", c: "Experiencias", tags: [], img: "" },
+        { 
+            n_es: "Tacos al pastor", n_en: "Tacos al pastor", p: 255, c: "Cena", 
+            d_es: "Salsa de tomate artesanal, queso mozzarella, pimientos, cebolla y champiñones.",
+            d_en: "Pork marinated in chili and spice adobo, served with grilled pineapple, onion and cilantro.",
+            tags: ["vegan"],
+            img: "https://i.postimg.cc/j2NBDqVZ/IMG-20260720-203905.jpg"
+        },
+        { 
+            n_es: "Pasta cremosa", n_en: "Creamy pasta",
+            p: 260, d_es: "Espaguetti al gusto con chipotle, salsa de tomate o al burro, servido con queso parmesano y pan tostado.", 
+            d_en: "Spaguetti prepared with your choise of chipotle sauce, tomatoe sauce or butter sauce, served with parmesan cheese and toasted bread.",
+            tags: ["vegan", "gf", "df"],
+            c: "Cena", img: "" 
+        },
+        { 
+            n_es: "Tacos de pescado", n_en: "Fish tacos",
+            p: 270, d_es: "Rebosados en tempura de cerveza oscura y especias cajún, servidos con ensalada de col, mayonesa de chipotle y limón", 
+            d_en: "Dark beer and Cajun tempura battered fish, served with coleslaw, chipotle mayonnaise and lime",
+            tags: ["vegan", "gf", "df"],
+            c: "Cena", img: "https://i.postimg.cc/hGBLbpRS/IMG-20260213-WA0021.jpg" 
+        },
+        { 
+            n_es: "Hamburguesa de la casa", n_en: "House burguer",
+            p: 315, d_es: "Hecha con sirloin y arrachera, pan brioche y servida con papas a la francesa. Cuál es el término de su preferencia? Rojo, medio o bien cocido", 
+            d_en: "Made with sirloin and flank steak, served on a brioche bun with french fries. What is your preferred level of doneness? Rare, medium, or well-done",
+            tags: ["vegan", "gf", "df"],
+            c: "Cena", img: "https://i.postimg.cc/vHs59RTT/SAVE-20260501-175829.jpg" 
+        },
+        { 
+            n_es: "Pizza Margarita", n_en: "Margherita pizza",
+            p: 215, d_es: "Salsa pomodoro,mozzarella y albahaca fresca.", 
+            d_en: "Pomodoro sauce, mozzarella and fresh basil.",
+            tags: ["vegan", "gf", "df"],
+            c: "Cena", img: "https://i.postimg.cc/FRbBhDc7/SAVE-20260604-183113.jpg" 
+        },
+        { 
+            n_es: "Pizza veggie", n_en: "Pizza veggie",
+            p: 255, d_es: "Champiñon, cebolla, espinaca y calabaza.", 
+            d_en: "Mushrooms, onion, spinach and zucchini.",
+            tags: ["vegan", "gf", "df"],
+            c: "Cena", img: "https://i.postimg.cc/26dKC2vb/SAVE-20260501-175804.jpg" 
+        },
+        
+        { 
+            n_es: "Arroz con leche", n_en: "Rice pudding",
+            p: 80, d_es: "Postre: Cremoso, con notas de canela y vainilla, acompañado de pasitas.", 
+            d_en: "Dessert: Creamy rice pudding with notes of cinnamon and vanilla, acompanied by raisins.",
+            c: "Cena", img: "" 
+        },
+        { 
+            n_es: "Flan de Vainilla", n_en: "Vanilla flan",
+            p: 70, d_es: "Postre: Cremoso, suave y dulce, que se deshace en cada bocado con el toque de caramelo dorado que recuerda a la cocina de la abuela.", 
+            d_en: "Dessert: Creamy, smooth, and sweet, melting in every bite with a touch of golden caramel reminiscent of grandma's kitchen .",
+            c: "Cena", img: "" 
+        },
+        { 
+            n_es: "Carlota de limón", n_en: "Key lime Charlotte",
+            p: 95, d_es: "Postre: Delicioso postre fresco con sabor cítrico, elaborado en suaves capas de crema y galleta.", 
+            d_en: " Dessert: A refreshing citrus dessert made with delicate layers of cream and coockies.",
+            c: "Cena", img: "" 
+        },
     
-        { n_es: "Cena Romántica en la Playa", n_en: "Romantic Beach Dinner", p: 3500, d_es: "Una velada inolvidable frente al mar con menú exclusivo.", d_en: "An unforgettable evening by the sea with an exclusive menu.", c: "Spa", tags: [], img: "" },
-        { n_es: "Tasting de Tequila Premium", n_en: "Premium Tequila Tasting", p: 1200, d_es: "Descubra las notas y herencia de nuestros tequilas.", d_en: "Discover the notes and heritage of our premium tequilas.", c: "Spa", tags: [], img: "" },
-    
+        { 
+            n_es: "Agua Evian natural", n_en: "Natural water Evian",
+            p: 205, d_es: "750 ml. No incluye el plan Todo Incluído", 
+            d_en: "750 ml. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Agua Evian mineral", n_en: "Sparkling water Evian",
+            p: 195, d_es: "750 ml. No incluye en el plan Todo Incluído.", 
+            d_en: "750 ml. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Café americano", n_en: "American coffee",
+            p: 90, d_es: "", 
+            d_en: "",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Jugo de naranja natural", n_en: "Natural orange juice",
+            p: 105, d_es: "", 
+            d_en: "",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Jugo verde Maya", n_en: "Mayan green juice",
+            p: 155, d_es: "Chaya, piña, pepino, apio y hierbabuena fresco y alcalino. No incluye en el plan Todo Incluído", 
+            d_en: "Chaya, pineapple, cucumber, celery and spearmint fresh and alcaline. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Smoothie tropical", n_en: "Tropical smoothie",
+            p: 165, d_es: "Mango, plátano y leche de coco con semillas de chía. No incluye en el plan Todo Incluído", 
+            d_en: "Mango, banana and coconut milk wuth chia seeds. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Piñada", n_en: "Piñada",
+            p: 180, d_es: "Mezcla cremosa de piña y coco, servida bien fría.", 
+            d_en: "Creamy blend of pineapple and coconut, served chilled.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Fresada", n_en: "Fresada",
+            p: 180, d_es: "Frappé de fresas naturales con un toque de limón. ", 
+            d_en: "Natural strawberry slushy with a hint of lime.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Margarita Clásica", n_en: "Margarita",
+            p: 355, d_es: "Tequila antiguo reposado de Herradura, controy y jugo de limón. Opciones de sabor a elegir: Maracuyá, Tamarindo o clásico.", 
+            d_en: "Tequila antiguo reposado de Herradura, controy and lemon juice. Flavor to choose: passion fruit, tamarind or classic.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Mezcalrita", n_en: "Mezcalrita",
+            p: 355, d_es: "Mezcal Amarás joven espadín, controy, jugo de limón. Opciones de sabor a elegir: Fresa, Mango, Maracuyá, pepino o picante.", 
+            d_en: "Amaras joven espadín mezcal, controy, lemon juice. Flavor to choose: strawberry, passion fruit, cucumber, or spicy.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Mojito tradicional", n_en: "Classic Mojito",
+            p: 355, d_es: "Ron Diplomático mantuano, jugo de limón, jarabe natural y menta fresca. Opciones de sabores: canela, chocolate o fresa.", 
+            d_en: "Diplomatico mantuano rum, lime juice, simple syrup and fresh mint. Flavor options: cinnamon, chocolate and strawberry.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Cielito Oaxaqueño", n_en: "Oaxacan Sky",
+            p: 390, d_es: "Mezcal, licor de violetas, arándano y escarcha de sal de gusano. No incluye en el plan Todo Incluído", 
+            d_en: "Mezcal, violet liqueur, cranberry, and worm salt rim. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Margarita Golden", n_en: "Golden Margarita",
+            p: 385, d_es: "Tequila Herradura reposado, grand marnier, jugo de limón. No incluye en el plan Todo Incluído", 
+            d_en: "Herradura reposado tequila, grand marnier, lemon juice. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Tulum sunset", n_en: "Tulum sunset",
+            p: 395, d_es: "Whisky Jack Daniel's, campari, jugo de toronja, miel y agua quina. No incluye en el plan Todo Incluído", 
+            d_en: "Jack Daniel's Whiskey, campari, grapefruit juice, honey and quina. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Alebrije", n_en: "Alebrije",
+            p: 355, d_es: "Mezcal amarás joven, chartreuse, jugo de piña, cilantro y jalapeño. No incluye en el plan Todo Incluído", 
+            d_en: "Amaras joven mezcal, chartreuse, pineapple juice, cilantro and jalapeño. Not included in the All-Inclusive plan.",
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "Ana y José", n_en: "Ana y Jose",
+            p: 385, d_es: "Mezcal 400 conejos blanco, Ron Diplomático Mantuano, pulpa de mango, piña, manzana y maracuyá. No incluye en el plan Todo Incluído", 
+            d_en: "400 conejos white mezcal, Diplomatico Mantuano rum, mango pulp, pineapple, apple and passion fruit. Not included in the All-Inclusive plan.",
+            tags: ["vegan", "df"],
+            c: "Bebidas", img: "" 
+        },
+        { 
+            n_es: "ANOCHECER (Menú de 4 Tiempos)", n_en: "DUSK (4-Course Menu)", 
+            p: 3700, d_es: "Montaje privado bajo las estrellas. Incluye: Martini de Maracuyá, Botella de agua, Copa de vino de la casa. Selección coordinada de entradas, plato fuerte y postre. Ver opciones de platillos en la imagen superior.", 
+            d_en: "Private setup under the stars. Includes: Passion fruit martini, Bottle of water, Glass of house wine. See dish choices in the image above.", 
+            c: "Experiencias", img: "https://i.postimg.cc/Wz80VxCY/IMG-20260517-123224.jpg"
+        },
+        { 
+            n_es: "Cena Romántica", n_en: "Romantic dinner", 
+            p: 3730, d_es: "Disfrute de una cena íntima a la luz de las velas con esa persona especial mientras disfruta de las impresionantes vistas al océano. Prepárese para deleitar sus sentidos con esta experiencia inolvidable. Se servirán en platones diferentes entradas, una variedad de proteínas y guarniciones, acompañadasde un petit de postres, todo para degustar en pareja, compartir y reafirmar el compromiso mutuo del amor.", 
+            d_en: "Enjoy an intimate, candlelight dinner with that special someone while taking in breathtaking ocean views. Prepare to delight your senses with this unforgettable experience. A selection of appetizers, proteins, and side dishes will be served on platters, accompanied by an assortment of mini desserts—all designed for the two of you to savor and share as you reaffirm your commitment to one another.", 
+            c: "Experiencias", img: "https://i.postimg.cc/fbxTWbz7/IMG-20251203-145706.jpg" 
+        },
+        { 
+            n_es: "TEQUILA TASTING", n_en: "TEQUILA TASTING", 
+            p: 2312.5, d_es: "En Hoteles Ana y José Collection es un honor poder llevarlos a este viaje de experiencia cultural, sensorial de nuestros tequila y gastronomía mexicana, esperando les permita descubrir, apreciar los sabores y aromas únicos de esta bebida mexicana ancestral milenaria. Reserva mínima 2 personas.", 
+            d_en: " At Ana y José Collection Hotels, it is an honor to take you on this cultural and sensory journey through our tequilas and Mexican gastronomy, hoping it will allow you to discover and appreciate the unique ﬂavors and aromas of this ancient Mexican beverage. Minimun 2 guest", 
+            c: "Experiencias", img: "https://i.postimg.cc/vTgmMtbr/IMG-20251219-WA0040.jpg" 
+        },
+        { 
+            n_es: "MEZCAL TASTING", n_en: "MEZCAL TASTING", 
+            p: 2312.5, d_es: "En Hoteles Ana y José Collection es un honor poder llevarlos a este viaje de experiencia cultural, sensorial de nuestros mezcales y gastronomía mexicana, esperando les permita descubrir, apreciar los sabores y aromas únicos de esta bebida mexicana ancestral milenaria. Reserva mínima 2 personas.", 
+            d_en: "At Ana y José Collection Hotels, it is an honor to take you on this cultural and sensory journey through our mezcals and Mexican gastronomy, hoping it will allow you to discover and appreciate the unique ﬂavors and aromas of this ancient Mexican beverage. Minimun 2 guest.", 
+            c: "Experiencias", img: "https://i.postimg.cc/NF90YkBR/IMG-20251219-WA0032.jpg" 
+        },
+        { 
+            n_es: "WINE TASTING", n_en: "WINE TASTING", 
+            p: 2312.5, d_es: "En Hoteles Ana y José Collection es un honor guiarlos en una experiencia cultural y sensorial de nuestras regiones vitivinícolas y la gastronomía mexicana, para descubrir y apreciar los sabores y aromas de esta bebida ancestral. Reserva mínima 2 personas.", 
+            d_en: "At Ana y José Hotels Collection, it is an honor to guide you through a cultural and sensory journey across our wine regions and Mexican gastronomy, inviting you to discover and appreciate the ﬂavors and aromas of this ancestral beverage. Minimun 2 guest", 
+            c: "Experiencias", img: "https://i.postimg.cc/0jMNx0PD/IMG-20251219-WA0034.jpg" 
+        },   
+        { 
+            n_es: "Renueva cuerpo y sentidos", n_en: "Renew body and senses", 
+            p: 2460, d_es: "De vacaciones en  pareja, familia y/o celebrando cumpleaños, aniversario o solo para relajarte?... waooo, tenemos el regalo perfecto para ella, para él o para tí...Un masaje relajante de 50 min + 15 min de exfoliación corporal (a elegir exfoliación de fresa con leche o chocolate) incluyendo 1 mimosa.... Reserva ya!!!! El precio es por persona..", 
+            d_en: "Vacationing as a couple or with family, celebrating a birthday or anniversary, or just looking to relax? Wow—we have the perfect gift for him, her or you!!!... A 50-minute relaxing massage plus a 15-minute body scrub (choose between strawberry & milk or chocolate), including a mimosa... Book now! Price is per person..", 
+            c: "Spa", img: "https://i.postimg.cc/j5vJF22r/Screenshot-2026-05-17-16-26-37-357-com-google-android-googlequicksearchbox-edit.jpg" 
+        },
+        { 
+            n_es: "Apapacho para pareja", n_en: "Couples massage", 
+            p: 4200, d_es: "De origen náhuatl, apapacho signiﬁca abrazar con el alma, eso es lo que su cuerpo sentirá con este masaje de presión suave a media, en el que el sistema nervioso y muscular se sentirán relajados, dejando el estrés atrás. 50 Min. Si usted reserva ahora le incluímos una mascarilla refrescante.", 
+            d_en: "Náhuatl origin, apapacho means to embrace with the soul, and that is what your body will feel with this massage of soft to medium pressure, in which the nervous and muscular systems will feel relaxed, leaving stress behind. 50 Min. If you book now, we'll include a refreshing face mask.", 
+            c: "Spa", img: "https://i.postimg.cc/MHW1gwsD/IMG-20260723-WA0029.jpg" 
+        },
+        { 
+            n_es: "Pixán", n_en: "Pixán", 
+            p: 2870, d_es: "Pixan signiﬁca (espíritu) en maya y esta terapia regresará tu espíritu y mente a su equilibrio. Masaje enfocado en las estructuras más profundas de los músculos, en el que se utiliza presión media-fuerte con el ﬁn de devolver movilidad a los músculos, liberar toxinas acumuladas en ellos y acelerar la circulación, complementado con la utilización de pindas herbales, las cuales ayudarán a los músculos y la mente a relajarse gracias a sus hierbas y esencias, ayudando a reducir el dolor. 70 Min. Si usted reserva ahora le incluímos una mascarilla refrescante.", 
+            d_en: "Pixan means (spirit) in Mayan, and this therapy will bring your spirit and mind back into balance. Massage focused on the deepest structures of the muscles, in which medium-strong pressure is used in order to restore mobility to the muscles, release accumulated toxins, and accelerate circulation. This therapy is complemented with the use of herbal pindas, which help the muscles and mind relax thanks to their herbs, essences, and warm temperature, helping to reduce pain. 70 Min. If you book now, we'll include a refreshing face mask.", 
+            c: "Spa", img: "https://i.postimg.cc/FKvKjvpr/SAVE-20260517-145341.jpg" 
+        },
+        { 
+            n_es: "Otoch", n_en: "Otoch", 
+            p: 1435, d_es: "Para los mayas, otoch signiﬁca hogar, y nuestro deseo es que a través de este masaje personalizado pueda regresar al suyo totalmente renovado y sanado por medio de varias técnicas de masaje, como el relajante, tejido profundo y estiramientos según sean requeridos. 30 Min. Si usted reserva ahora le incluímos una mascarilla refrescante.", 
+            d_en: "For the Mayan people, otoch means home, and our desire is that through this personalized massage you can return to yours totally renewed and healed through various massage techniques such as relaxing, deep tissue, and stretching as required. 30 Min. If you book now, we'll include a refreshing face mask.", 
+            c: "Spa", img: "https://i.postimg.cc/Wz20xV9w/IMG-20260723-WA0028.jpg" 
+        },
+       
         // SERVICIOS CONCIERGE (Operativos / Asistencias)
         { n_es: "Asistencia Bellboy (Check-out)", n_en: "Bellboy Assistance", p: 0, d_es: "Solicite ayuda con su equipaje directamente en su puerta.", d_en: "Request luggage assistance directly at your door.", c: "Concierge", img: "" },
-        { n_es: "Consulta con Concierge", n_en: "Concierge Consultation", p: 0, d_es: "Recomendaciones de cenotes, clubes de playa, tours y transporte.", d_en: "Cenotes, beach clubs, tours and transportation recommendations.", c: "Concierge", img: "" },
-        { n_es: "Boxlunch (Tour/Early Check-out)", n_en: "Early Boxlunch", p: 0, d_es: "Sándwich de jamón y queso, fruta y agua. Solicitar con anticipación.", d_en: "Ham and cheese sandwich, fruit and water. Please request in advance.", c: "Concierge", img: "" },
+        { n_es: "Consulta con Concierge", n_en: "Concierge Consultation", p: 0, d_es: "Recomendaciones de cenotes, zonas Arqueológicas, tours y transporte.", d_en: "Cenotes, archaeological ruins, tours and transportation recommendations.", c: "Concierge", img: "" },
+        { n_es: "Boxlunch (Tour/Early Check-out)", n_en: "Early Boxlunch", p: 0, d_es: "Si usted, va a algún tour o realiza el check out muy temprano, no se preocupe le ofrecemos un boxlunch, solicitelo con anticipación, el boxlunch es un Sándwich de jamón y queso, fruta de mano. Coordine con su concierge.", d_en: "If you are going on a tour or checking out very early, don't worry—we offer a boxed lunch; please request it in advance. The boxed lunch consists of a ham and cheese sandwich and fresh fruit. Coordinate with your concierge..", c: "Concierge", img: "" },
         { n_es: "Chef Privado en Habitación", n_en: "Private Chef", p: 0, d_es: "Experiencia culinaria privada.", d_en: "Private culinary experience.", c: "Concierge", img: "" },
         { n_es: "Bartender Privado", n_en: "Private Bartender", p: 0, d_es: "Servicio de mixología a la medida.", d_en: "Custom mixology service.", c: "Concierge", img: "" },
         { n_es: "Reserva Cava de Vino", n_en: "Wine Cellar Reservation", p: 0, d_es: "Espacio privado para juntas o micro-eventos (Max 8 personas).", d_en: "Private space for meetings or micro-events (Max 8 pax).", c: "Concierge", img: "" },
-        { n_es: "Solicitud Especial (Fuera de carta)", n_en: "Off-menu Food Request", p: 0, d_es: "Indique su antojo especial para gestionarlo con cocina.", d_en: "Indicate your special craving to coordinate with the kitchen.", c: "Concierge", img: "" },
-        { n_es: "Evento/Programa en Restaurante", n_en: "Restaurant Event/TV", p: 0, d_es: "Solicite sintonizar un partido o evento especial en pantallas.", d_en: "Request to tune into a match or special event on screens.", c: "Concierge", img: "" },
-        { n_es: "Eventos en Grupo (Family Style)", n_en: "Group Events (Family Style)", p: 0, d_es: "Taco bar, comidas o cenas estilo familiar.", d_en: "Taco bar, family style lunches or dinners.", c: "Concierge", img: "" },
-        { n_es: "Consulta con Concierge / Tours", n_en: "Concierge & Tours Consultation", p: 0, d_es: "Recomendaciones personalizadas de tours exclusivos, visitas a cenotes mágicos, ruinas arqueológicas y traslados privados.", d_en: "Personalized recommendations for exclusive tours, magical cenote visits, archaeological ruins, and private transfers.", c: "Concierge", tags: [], img: "" },
+        { n_es: "Solicitud Especial (Fuera de carta)", n_en: "Off-menu Food Request", p: 0, d_es: "Si tienes antojo de algún platillo que no encuentras en el menú, no te preocupes!!, podemos consultar con el Chef Ejecutivo la posibilidad de realizarlo.", d_en: "If you have a craving for a dish that isn't on the menu, don't worry; we can check with the Executive Chef about the possibility of preparing it for you.", c: "Concierge", img: "" },
+        { n_es: "Evento/Programa en Restaurante", n_en: "Restaurant Event/TV", p: 0, d_es: "Solicite sintonizar un partido o evento especial en pantallas en nuestro restaurante Palapa.", d_en: "Request to tune into a match or special event on screens at our Palapa restaurant.", c: "Concierge", img: "" },
+        { n_es: "Eventos en Grupo (Family Style)", n_en: "Group Events (Family Style)", p: 0, d_es: " También realizamos eventos para grupos, ya sea boda, cumpleaños, alguna conferencia de presentación, ofrecernos Tacobar, Servicio Family Style, Barra Libre, nuestro Restaurante puede brindarle más información sin compromiso.", d_en: "We also host group events—such as weddings, birthdays, or presentation conferences—offering options like a taco bar, family-style service, and open bar; our restaurant can provide you with further information without obligation.", c: "Concierge", img: "" },
+        { n_es: "Consulta con Concierge / Tours", n_en: "Concierge & Tours Consultation", p: 0, d_es: "Recomendaciones personalizadas de renta de scooter, ATV, bicicletas o necesitas toallas extra para llevar, etc.", d_en: "Personalized recommendations for  Scooter, ATV, and bicycle rentals or you need extra towels to take with you.", c: "Concierge", tags: [], img: "" },
         { n_es: "Que puedo encontrar en la Boutique?", n_en: "What can I find in the boutique?", p: 0, d_es: "Ahi puedes encontrar variedad de modelos de ropa de playa, flotadores, souvenirs, cepillos dentales, pasta dental, cigarros. Tambien puedes pagar con efectivo, dólares, tarjetas de crédito y/o débito..", d_en: "There, you can find a variety of beachwear, pool floats, souvenirs, toothbrushes, toothpaste, and cigarettes. You can also pay with cash, dollars, and credit or debit cards.", c: "Concierge", tags: [] }
     ];
 
@@ -330,6 +696,43 @@
         setTimeout(() => {
             toast.style.display = 'none';
         }, 1500);
+    }
+
+    /* FUNCIONES DE MODAL Y CONFIGURACIÓN WI-FI */
+    function abrirWifiModal() {
+        document.getElementById('modal-wifi-ssid').innerText = WIFI_SSID;
+        document.getElementById('modal-wifi-pass').innerText = WIFI_PASS;
+        document.getElementById('wifi-ssid-banner').innerText = WIFI_SSID;
+        
+        // Genera QR dinámico para conexión directa a Wi-Fi
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=WIFI%3AS%3A${encodeURIComponent(WIFI_SSID)}%3BT%3AWPA%3BP%3A${encodeURIComponent(WIFI_PASS)}%3B%3B&size=200x200`;
+        document.getElementById('wifi-qr-img').src = qrUrl;
+        
+        document.getElementById('wifi-modal').style.display = 'flex';
+    }
+
+    function cerrarWifiModal(e) {
+        if (e.target.id === 'wifi-modal') {
+            document.getElementById('wifi-modal').style.display = 'none';
+        }
+    }
+
+    function cerrarWifiModalDirecto() {
+        document.getElementById('wifi-modal').style.display = 'none';
+    }
+
+    function copiarWifiPass() {
+        navigator.clipboard.writeText(WIFI_PASS).then(() => {
+            mostrarToast("📋 ¡Contraseña copiada!");
+        }).catch(() => {
+            const tempInput = document.createElement("input");
+            tempInput.value = WIFI_PASS;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            mostrarToast("📋 ¡Contraseña copiada!");
+        });
     }
 
     function estaEnHorario(categoria) {
@@ -346,7 +749,7 @@
             return (minsActuales >= 1110 && minsActuales <= 1350);
         }
         if (categoria === 'Bebidas') {
-            return (minsActuales >= 1110 && minsActuales <= 1350);
+            return (minsActuales >= 450 && minsActuales <= 1350);
         }
         return true; 
     }
@@ -363,6 +766,7 @@
         document.getElementById('lblSubtotal').innerText = t.subtotal;
         document.getElementById('lblServicio').innerText = t.servicio;
         document.getElementById('lblTotal').innerText = t.total;
+        document.getElementById('wifi-ssid-banner').innerText = WIFI_SSID;
         
         const nav = document.getElementById('navCats');
         const activeCat = document.querySelector('.btn-cat.active')?.getAttribute('data-cat') || 'Desayuno';
@@ -374,6 +778,30 @@
         
         filtrar(activeCat, document.querySelector(`[data-cat="${activeCat}"]`));
         renderCarrito();
+    }
+
+    function actualizarBotonConcierge() {
+        const chk = document.getElementById('concierge-attention-pref');
+        const btn = document.getElementById('btn-concierge-submit');
+        const urgentFields = document.getElementById('concierge-urgent-fields');
+        if (!chk || !btn) return;
+        
+        if (chk.checked) {
+            if (urgentFields) urgentFields.style.display = "block";
+            btn.innerText = currentLang === 'es' ? "Enviar directo a WhatsApp" : "Send directly to WhatsApp";
+            btn.style.background = "#25D366";
+            
+            const mainName = document.getElementById('guest-name').value;
+            const mainRoom = document.getElementById('room-num').value;
+            const urgentNameInput = document.getElementById('concierge-urgent-name');
+            const urgentRoomInput = document.getElementById('concierge-urgent-room');
+            if (mainName && urgentNameInput && !urgentNameInput.value) urgentNameInput.value = mainName;
+            if (mainRoom && urgentRoomInput && !urgentRoomInput.value) urgentRoomInput.value = mainRoom;
+        } else {
+            if (urgentFields) urgentFields.style.display = "none";
+            btn.innerText = translations[currentLang].agregar;
+            btn.style.background = "var(--oro)";
+        }
     }
 
     function filtrar(cat, btn) {
@@ -406,16 +834,33 @@
             </div>`;
         } else if (cat === 'Bebidas') {
             infoBanner = `<div style="grid-column: 1/-1; background:#f9f7f2; padding:15px; border:1px solid var(--oro); border-radius:8px; font-size:0.85rem; margin-bottom:10px;">
-                ⏰ <strong>${currentLang === 'es' ? 'Horario de Bebidas:' : 'Drinks Hours:'}</strong> 6:30 PM - 10:30 PM<br>
+                ⏰ <strong>${currentLang === 'es' ? 'Horario de Bebidas:' : 'Drinks Hours:'}</strong> 7:30 AM - 10:30 PM<br>
                 📌 <em style="color:#d9534f; font-weight:bold;">${t.propinaLeyenda}</em>
             </div>`;
-        } else if (cat === 'Spa' || cat === 'Experiencias') {
-            let extraTipsMsg = cat === 'Experiencias' ? `<br>✨ <strong style="color:#2e7d32;">${currentLang === 'es' ? 'Incluye 18% de servicio (tips)' : 'Includes 18% service (tips)'}</strong>` : '';
+        } else if (cat === 'Spa') {
+            /* FOTO Y DESCRIPCIÓN EXCLUSIVA DEL SPA */
+            const fotoSpa = "https://i.postimg.cc/FKvKjvpr/SAVE-20260517-145341.jpg";
+            const descEs = "Bienvenido a nuestro santuario de bienestar. Disfrute de una experiencia holística diseñada para restaurar el equilibrio entre cuerpo y mente a través de masajes curativos, terapias ancestrales y tratamientos corporales revitalizantes frente al mar.";
+            const descEn = "Welcome to our wellness sanctuary. Enjoy a holistic experience designed to restore balance between body and mind through healing massages, ancient therapies, and revitalizing body treatments by the sea.";
+
+            infoBanner = `
+            <div style="grid-column: 1/-1; background:#ffffff; border:1px solid var(--oro); border-radius:12px; overflow:hidden; margin-bottom:15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <img src="${fotoSpa}" alt="Spa Ana y José" style="width:100%; height:200px; object-fit:cover; display:block;">
+                <div style="padding:15px;">
+                    <h3 style="margin:0 0 6px 0; color:var(--oscuro); font-size:1.1rem; font-weight:bold;">🌿 Spa & Wellness</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#555; line-height:1.4;">
+                        ${currentLang === 'es' ? descEs : descEn}
+                    </p>
+                </div>
+            </div>`;
+        } else if (cat === 'Experiencias') {
+            let extraTipsMsg = `<br>✨ <strong style="color:#2e7d32;">${currentLang === 'es' ? 'Incluye 18% de servicio (tips)' : 'Includes 18% service (tips)'}</strong>`;
             infoBanner = `<div style="grid-column: 1/-1; background:#f9f7f2; padding:15px; border:1px solid var(--oro); border-radius:8px; font-size:0.85rem; margin-bottom:10px;">
                 <strong>💡 Información de Interés / General Info:</strong><br>
                 🏊 <strong>Alberca / Pool:</strong> 9:00 AM - 7:00 PM.<br>
                 🏋️ <strong>Gimnasio/ Gym:</strong> 7:00 AM - 9:00 PM.<br>
-                🛍️ <strong>Boutique:</strong> 11:00 AM - 9:00 PM.${extraTipsMsg}
+                🛍️ <strong>Boutique:</strong> 11:00 AM - 9:00 PM.  
+                <strong>En nuestras experiencias:</strong>${extraTipsMsg}
             </div>`;
         }
 
@@ -428,13 +873,28 @@
                         <span style="color: var(--oro);">${currentLang === 'es' ? '✨ Solicitar atención personalizada de su Concierge' : '✨ Request personalized attention from your concierge'}</span>
                     </div>
                     <textarea id="concierge-custom-text" style="height: 100px;" placeholder="${currentLang === 'es' ? 'Escribe aquí la atención o información que necesitas...' : 'Write the assistance or information you need here....'}"></textarea>
-                    <div style="margin: 10px 0 15px 0; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="concierge-attention-pref" checked style="width: auto; margin: 0;">
-                        <label for="concierge-attention-pref" style="font-weight: 600; color: var(--oscuro);">
+                    
+                    <div style="margin: 10px 0 12px 0; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="concierge-attention-pref" style="width: auto; margin: 0; cursor: pointer;" onchange="actualizarBotonConcierge()">
+                        <label for="concierge-attention-pref" style="font-weight: 600; color: var(--oscuro); cursor: pointer;">
                             ${currentLang === 'es' ? '¿Desea recibir atención directa por WhatsApp?' : 'Would you like to receive direct attention via WhatsApp?'}
                         </label>
                     </div>
-                    <button class="btn-add" style="background: var(--oro);" onclick="agregarConciergePersonalizado()">${t.agregar}</button>
+
+                    <div id="concierge-urgent-fields" style="display: none; background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid var(--oro); margin-bottom: 12px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="font-size: 0.75rem; font-weight:bold; color:var(--oscuro);">${currentLang === 'es' ? 'Nombre:' : 'Name:'}</label>
+                                <input type="text" id="concierge-urgent-name" class="form-input" placeholder="${currentLang === 'es' ? 'Su Nombre' : 'Your Name'}" style="margin-top: 4px; padding: 8px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.75rem; font-weight:bold; color:var(--oscuro);">${currentLang === 'es' ? 'Habitación:' : 'Room:'}</label>
+                                <input type="text" id="concierge-urgent-room" class="form-input" placeholder="${currentLang === 'es' ? 'Ej. 110A' : 'Ex. 110A'}" style="margin-top: 4px; padding: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-concierge-submit" class="btn-add" style="background: var(--oro);" onclick="agregarConciergePersonalizado()">${t.agregar}</button>
                 </div>
             </div>`;
         }
@@ -443,13 +903,13 @@
             const inputID = `note-${cat.replace(/\s+/g, '')}-${i}`;
             let placeholderText = ['Desayuno', 'Lunch', 'Cena', 'Bebidas'].includes(cat) ? 
                 (currentLang === 'es' ? "Notas: por favor indique preferencia y/o alguna restricción alimenticia..." : "Notes: please indicate preference and/or any dietary restriction...") :
-                (currentLang === 'es' ? "Notas: Reserve con anticipación, por favor indique la fecha y horario...." : "Notes: Book in advance, please indicate date and time....");
+                (currentLang === 'es' ? "Notas particulares para esta solicitud..." : "Special notes for this request...");
 
             let tagsHtml = (p.tags || []).map(tagKey => `<span class="tag-badge ${tagKey}">${t[tagKey]}</span>`).join('');
             const precioUSD = p.p > 0 ? (p.p / TIPO_CAMBIO).toFixed(2) : 0;
             const precioDisplay = p.p > 0 ? `<span class="precio">$${p.p} MXN <small style="font-size:0.75rem; color:#888; font-weight:normal;">($${precioUSD} USD)</small></span>` : '';
 
-            let fotoHtml = p.img ? `<img src="${p.img}" alt="${p.n_es}" style="width: 100%; height: 180px; object-fit: cover;">` : '';
+            let fotoHtml = p.img ? `<img src="${p.img}" alt="${p.n_es}" style="width: 100%; height: 180px; object-fit: contain; background: #faf9f5;">` : '';
             let cardClass = p.img ? 'card' : 'card no-photo';
 
             const disponible = estaEnHorario(cat);
@@ -483,14 +943,47 @@
 
     function agregarConciergePersonalizado() {
         const text = document.getElementById('concierge-custom-text').value.trim();
-        if(!text) return;
+        const t = translations[currentLang];
+        
+        if(!text) {
+            mostrarToast(currentLang === 'es' ? "⚠️ Por favor escribe tu solicitud" : "⚠️ Please write your request");
+            return;
+        }
+
         const prefAtencion = document.getElementById('concierge-attention-pref').checked;
-        const nombreItem = currentLang === 'es' ? "Solicitud Tours / Concierge" : "Tours / Concierge Request";
-        const notaCompleta = `${text} | ${currentLang === 'es' ? 'Atención Directa' : 'Direct Attention'}: ${prefAtencion ? 'Sí' : 'No'}`;
-        carrito.push({ nombre: nombreItem, precio: 0, nota: notaCompleta, categoria: "Concierge" });
-        document.getElementById('concierge-custom-text').value = "";
-        renderCarrito();
-        mostrarToast("Ok"); 
+
+        if (prefAtencion) {
+            let nom = document.getElementById('concierge-urgent-name')?.value.trim();
+            let hab = document.getElementById('concierge-urgent-room')?.value.trim();
+
+            if(!nom || !hab) {
+                mostrarToast(t.errDatos);
+                if(!nom && document.getElementById('concierge-urgent-name')) document.getElementById('concierge-urgent-name').focus();
+                else if(!hab && document.getElementById('concierge-urgent-room')) document.getElementById('concierge-urgent-room').focus();
+                return;
+            }
+
+            if(document.getElementById('guest-name')) document.getElementById('guest-name').value = nom;
+            if(document.getElementById('room-num')) document.getElementById('room-num').value = hab;
+
+            const NUMERO_CONCIERGE = "5219841862451"; 
+            const cabecera = "*SOLICITUD URGENTE / CONCIERGE DIRECTO*";
+            const msg = `${cabecera}\n*Nombre:* ${nom}\n*Habitación:* ${hab}\n*Notas:* ${text}`;
+
+            window.open(`https://wa.me/${NUMERO_CONCIERGE}?text=${encodeURIComponent(msg)}`, '_blank');
+
+            document.getElementById('concierge-custom-text').value = "";
+            if(document.getElementById('concierge-urgent-name')) document.getElementById('concierge-urgent-name').value = "";
+            if(document.getElementById('concierge-urgent-room')) document.getElementById('concierge-urgent-room').value = "";
+            document.getElementById('concierge-attention-pref').checked = false;
+            actualizarBotonConcierge();
+        } else {
+            const nombreItem = currentLang === 'es' ? "Solicitud Tours / Concierge" : "Tours / Concierge Request";
+            carrito.push({ nombre: nombreItem, precio: 0, nota: text, categoria: "Concierge" });
+            document.getElementById('concierge-custom-text').value = "";
+            renderCarrito();
+            mostrarToast("Ok"); 
+        }
     }
 
     function renderCarrito() {
@@ -504,7 +997,7 @@
         if(carrito.length === 0) { 
             headerWrapper.innerHTML = ""; lista.innerHTML = ""; box.style.display = "none"; 
             propinaMsg.style.display = "none"; mezclaWarning.style.display = "none"; 
-            paymentWrapper.style.display = "block"; // Reset por defecto
+            paymentWrapper.style.display = "block"; 
             return; 
         }
         
@@ -566,7 +1059,6 @@
             document.getElementById('btnSend').style.cursor = "pointer";
         }
 
-        // 🔥 LÓGICA INTELIGENTE DE PANTALLA EXCLUSIVA PARA CONCIERGE
         if (tieneConcierge) {
             paymentWrapper.style.display = "none";
             box.style.display = "none";
@@ -626,20 +1118,33 @@
         let num = NUMERO_RESTAURANTE;
         let cabecera = "*SOLICITUD DE ALIMENTOS Y BEBIDAS*";
         
-        if(tieneSpa) { num = NUMERO_SPA; cabecera = "*RESERVA DE SPA (NIKVA)*"; } 
+        if(tieneSpa) { num = NUMERO_SPA; cabecera = "*RESERVA DE SPA ANA Y JOSÉ*"; } 
         else if(tieneExperiencias) { num = NUMERO_EXPERIENCIAS; cabecera = "*SOLICITUD DE EXPERIENCIAS VIP*"; } 
         else if(tieneConcierge) { num = NUMERO_CONCIERGE; cabecera = "*SOLICITUD DE TOURS & CONCIERGE*"; }
 
-        // 🔥 FILTRADO TEXTUAL EN EL ENVÍO: Si es Concierge omitimos la forma de pago por WhatsApp
-        let msg = `${cabecera}%0A*Nombre:* ${nom}%0A*Habitación:* ${hab}%0A`;
-        if (!tieneConcierge) {
-            msg += `*Forma de Pago:* ${pago}%0A`;
-        }
-        msg += `---%0A`;
-        
-        carrito.forEach(i => msg += `• ${i.nombre} ${i.nota ? `[Detalles: ${i.nota}]` : ''}%0A`);
+        let msg = "";
 
-        window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+        if (tieneConcierge) {
+            msg = `${cabecera}\n*Nombre:* ${nom}\n*Habitación:* ${hab}\n`;
+            let lineasNotas = [];
+            carrito.forEach(i => {
+                if (i.nombre.includes("Solicitud") || i.nombre.includes("Request")) {
+                    lineasNotas.push(i.nota);
+                } else {
+                    if (i.nota) { lineasNotas.push(`${i.nombre} (${i.nota})`); } 
+                    else { lineasNotas.push(i.nombre); }
+                }
+            });
+            msg += `*Notas:* ${lineasNotas.join(", ")}`;
+        } else {
+            msg = `${cabecera}\n*Nombre:* ${nom}\n*Habitación:* ${hab}\n*Forma de Pago:* ${pago}\n---\n`;
+            carrito.forEach(i => msg += `• ${i.nombre} ${i.nota ? `[Detalles: ${i.nota}]` : ''}\n`);
+        }
+
+        window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+
+        carrito = [];
+        renderCarrito();
     }
 
     function irAExperiencia(tipo) {
@@ -652,4 +1157,3 @@
 </script>
 </body>
 </html>
-
